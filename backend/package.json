@@ -5,17 +5,22 @@
   "main": "index.js",
   "scripts": {
     "produce": "ts-node src/producer.ts",
-    "consume": "ts-node src/consumer.ts"
+    "consume": "ts-node src/consumer.ts",
+    "server": "ts-node src/server.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "ioredis": "^6.0.0",
     "kafkajs": "^2.2.4",
     "mongodb": "^7.6.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^20.11.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
