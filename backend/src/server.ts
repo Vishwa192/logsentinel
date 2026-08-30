@@ -1,14 +1,24 @@
 import express from 'express';
 import cors from 'cors';
 import { getDB, LOGS_COLLECTION } from './mongo';
-import { Timestamp } from 'mongodb';
-import { timeStamp } from 'console';
+import { getCurrentErrorCount } from './errorTracker';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const PORT = 4000;
+const KNOWN_SERVICES = ['payment_service', 'auth_service', 'notification_service']
+
+app.get('/api/live-stats', async(req,res)=>{
+    const liveStats = await Promise.all(
+        KNOWN_SERVICES.map(async (service)=>({
+            service,
+            currentErrorCount: await getCurrentErrorCount(service)
+        }))
+    );
+    res.json(liveStats);
+});
 
 app.get('/api/logs', async (req, res) =>{
     const db =  await getDB();
