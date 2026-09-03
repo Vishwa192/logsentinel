@@ -45,7 +45,7 @@ app.get('/api/stats', async (req, res)=>{
 
 app.get('/api/incidents', async(req, res) => {
     const db = await getDB();
-    const incidents = db.collection('incidents')
+    const incidents =await db.collection('incidents')
     .find({})
     .sort({detectedAt: -1})
     .limit(20)
