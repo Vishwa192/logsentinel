@@ -18,8 +18,10 @@ interface Stat{
 interface Incident{
     _id: string;
     service: string;
-    errorCount: string;
+    errorCount: number;
     summary: string;
+    status: string;
+    resolvedAt: string;
     detectedAt: string;
 }
 
@@ -37,6 +39,18 @@ export default function Dashboard() {
   const [incidents, setIncidents] = useState<Incident[]>([]); 
   const [liveStat, setLiveStats] = useState<LiveStat[]>([]);
 
+  async function resolveIncidents(id: string){
+    try{
+        await fetch(`${API_BASE}/incidents/${id}/resolve`, {method: 'PATCH'});
+        setIncidents((prev) => 
+        prev.map((inc)=>
+            inc._id === id ? {...inc, status: 'resolved', resolvedAt: new Date().toISOString()} : inc 
+        )
+        );
+    }catch(err){
+        console.error('Failed to resolve incident', err);
+    }
+  }
   useEffect(() =>{
     async function fetchData() {
         try{
@@ -102,10 +116,31 @@ export default function Dashboard() {
              )}
              <div className="space-y-3">
                 {incidents.map((inc) => (
-                    <div key={inc._id} className="p-4 rounded-lg border border-yellow-600 bg-yellow-950">
-                        <p className="font-semibold">{inc.service} - {inc.errorCount} errors</p>
-                        <p className="text-sm text-gray-300 mt-1">{inc.summary}</p>
+                    <div key={inc._id} className={`p-4 rounded-lg border 
+                        ${inc.status === 'resolved'
+                        ? 'border-gray-700 bg-gray-900 opacity-60'
+                        :'border-yellow-600 bg-yellow-950'
+                    }`}>
+                    <div className="flex justify-between items-start gap-4">
+                        <div>
+                            <p className="font-semibold">{inc.service} - {inc.errorCount} errors
+                                {inc.status === 'resolved' && (
+                                    <span className="ml-2 text-xs text-green-400">✅ Resolved</span>
+                                )}
+                            </p>
+                            <p className="text-sm text-gray-300 mt-1">{inc.summary}</p>
                         <p className="text-xs text-gray-500 mt-1">{new Date(inc.detectedAt).toLocaleString()}</p>
+                        </div>
+                    </div> 
+                    {inc.status !== 'resolved' && (
+                        <button
+                            onClick={() => resolveIncidents(inc._id)}
+                            className="shrink-0 px-3 py-1.5 rounded bg-green-700 hover:bg-green-600 text-xs font-medium transition-colors"
+                        >
+                            Mark Resolved
+                        </button>
+                    )}    
+                        
                     </div>
                 ))}
              </div>

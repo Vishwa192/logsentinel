@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { getDB, LOGS_COLLECTION } from './mongo';
 import { getCurrentErrorCount } from './errorTracker';
+import { ObjectId } from 'mongodb';
 
 const app = express();
 app.use(cors());
@@ -51,6 +52,17 @@ app.get('/api/incidents', async(req, res) => {
     .limit(20)
     .toArray();
     res.json(incidents);
+});
+
+app.patch('/api/incidents/:id/resolve', async(req, res) => {
+    const db = await getDB();
+    const {id} =  req.params;
+
+    const result = await db.collection('incidents').updateOne(
+        {_id: new ObjectId(id)},
+        {$set: {status: 'resolved', resolvedAt: new Date().toISOString()}}
+    );
+    res.json({success: result.modifiedCount === 1});
 })
 
 app.listen(PORT, () => {
