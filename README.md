@@ -8,7 +8,7 @@ This project started as a way for me to learn Kafka and Redis beyond tutorials. 
 
 ## Architecture
 
-![LogSentinel Architecture](docs/architecture.png)
+![LogSentinel Architecture](docs/Architecture.png)
 
 ---
 
