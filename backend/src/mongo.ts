@@ -1,9 +1,7 @@
 import {MongoClient} from 'mongodb'
+import { MONGO_URL, DB_NAME } from './constants';
 
-const mongoURL = 'mongodb://localhost:27017';
-const DB_NAME = 'logsentinel';
-
-const client = new MongoClient(mongoURL);
+const client = new MongoClient(MONGO_URL);
 let connected = false;
 
 export async function getDB(){
@@ -15,4 +13,4 @@ export async function getDB(){
     return client.db(DB_NAME);
 }
 
-export const LOGS_COLLECTION = 'logs';
+// export const LOGS_COLLECTION = 'logs';

@@ -1,15 +1,14 @@
 import express from 'express';
 import cors from 'cors';
-import { getDB, LOGS_COLLECTION } from './mongo';
+import { getDB } from './mongo';
 import { getCurrentErrorCount } from './errorTracker';
 import { ObjectId } from 'mongodb';
+import { PORT, KNOWN_SERVICES, INCIDENTS_COLLECTION, LOGS_COLLECTION } from './constants';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = 4000;
-const KNOWN_SERVICES = ['payment_service', 'auth_service', 'notification_service']
 
 app.get('/api/live-stats', async(req,res)=>{
     const liveStats = await Promise.all(
@@ -46,7 +45,7 @@ app.get('/api/stats', async (req, res)=>{
 
 app.get('/api/incidents', async(req, res) => {
     const db = await getDB();
-    const incidents =await db.collection('incidents')
+    const incidents =await db.collection(INCIDENTS_COLLECTION)
     .find({})
     .sort({detectedAt: -1})
     .limit(20)
@@ -58,7 +57,7 @@ app.patch('/api/incidents/:id/resolve', async(req, res) => {
     const db = await getDB();
     const {id} =  req.params;
 
-    const result = await db.collection('incidents').updateOne(
+    const result = await db.collection(INCIDENTS_COLLECTION).updateOne(
         {_id: new ObjectId(id)},
         {$set: {status: 'resolved', resolvedAt: new Date().toISOString()}}
     );
