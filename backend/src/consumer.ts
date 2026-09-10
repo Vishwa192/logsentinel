@@ -1,7 +1,8 @@
-import { kafka, LOG_TOPIC } from "./kafka";
-import { getDB, LOGS_COLLECTION } from "./mongo";
+import { kafka } from "./kafka";
+import { getDB } from "./mongo";
 import { recordError, isSpike, getRecentErrors } from "./errorTracker";
 import { generateRootCauseSummary } from "./ai-summary";
+import { INCIDENTS_COLLECTION, LOGS_COLLECTION, LOG_TOPIC } from "./constants";
 
 const consumer = kafka.consumer({groupId: 'log-processor-group'});
 const alreadySummarized = new Set<string>();
@@ -9,7 +10,7 @@ const alreadySummarized = new Set<string>();
 async function run() {
     const db=await getDB();
     const logsCollections = db.collection(LOGS_COLLECTION);
-    const incidentsCollection = db.collection('incidents');
+    const incidentsCollection = db.collection(INCIDENTS_COLLECTION);
 
     await consumer.connect();
     await consumer.subscribe({topic: LOG_TOPIC, fromBeginning: true});
@@ -57,8 +58,6 @@ async function run() {
                     console.log(`Stored: ${log.service} ${log.level} ${log.message}`);
                 }
             }
-
-            // console.log('Stored:', log.service, log.level, log.message);
         },
     });
 }

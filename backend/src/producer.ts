@@ -1,4 +1,5 @@
-import {kafka, LOG_TOPIC} from './kafka';
+import {kafka} from './kafka';
+import { LOG_TOPIC } from './constants';
 
 const producer =  kafka.producer();
 
